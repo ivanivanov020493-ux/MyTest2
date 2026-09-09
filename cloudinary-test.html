@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cloudinary live-frame test</title>
+<style>
+body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
+#status{margin:12px}
+img{display:block;width:min(960px,100vw);height:auto;margin:auto}
+</style>
+<p id="status">Запуск…</p>
+<img id="screen" alt="Тестовый кадр">
+<script>
+const base='https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-test.png';
+const image=document.getElementById('screen');
+const status=document.getElementById('status');
+let requests=0;
+function refresh(){
+  requests++;
+  image.onload=()=>status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · запрос '+requests;
+  image.onerror=()=>status.textContent='Ошибка загрузки · запрос '+requests;
+  image.src=base+'?t='+Date.now();
+}
+refresh();
+setInterval(refresh,1000);
+</script>
+</html>
