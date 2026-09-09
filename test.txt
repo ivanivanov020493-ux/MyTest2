@@ -1,2 +1,2 @@
-RAW-REFS-TEST-1788957852465
-Немедленная проверка main и refs/heads/main
+REF-LIVE-A-1788958094681
+git/ref cache-busted test A
