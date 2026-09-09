@@ -23,7 +23,7 @@ small{color:#aaa}code{color:#9fe}
 const owner='ivanivanov020493-ux';
 const repo='MyTest2';
 const file='test.txt';
-const intervalMs=65000;
+const intervalMs=new URLSearchParams(location.search).get('benchmark')==='1'?2000:65000;
 let lastSha='';
 let timer;
 const events=[];
@@ -83,7 +83,7 @@ async function poll(){
       addEvent('SHA '+sha.slice(0,12)+'; файл обновлён');
     }
     document.getElementById('status').textContent=
-      'Следующий опрос через 65 с | SHA='+lastSha.slice(0,12)+
+      'Следующий опрос через '+Math.round(intervalMs/1000)+' с | SHA='+lastSha.slice(0,12)+
       ' | API '+h['x-ratelimit-remaining']+'/'+h['x-ratelimit-limit']+
       ' | reset='+h['x-ratelimit-reset']+
       ' | запрос '+(Date.now()-started)+' мс\n'+JSON.stringify(h,null,2);
