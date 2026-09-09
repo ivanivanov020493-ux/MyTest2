@@ -2,26 +2,47 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1C live screen</title>
+<title>1С live screen</title>
 <style>
-body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
-#status{margin:10px}
-img{display:block;width:min(1280px,100vw);height:auto;margin:auto}
+html,body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
+#status{margin:12px}
+#screen{display:block;width:min(960px,100vw);height:auto;margin:auto;background:#111}
 </style>
-<p id="status">Запуск трансляции…</p>
+<p id="status">Загрузка первого кадра…</p>
 <img id="screen" alt="Экран 1С">
 <script>
 const base='https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-test.jpg';
-const image=document.getElementById('screen');
+const screen=document.getElementById('screen');
 const status=document.getElementById('status');
 let requests=0;
+let timer=null;
+
+function schedule(ms=1000){
+  clearTimeout(timer);
+  timer=setTimeout(refresh,ms);
+}
+
 function refresh(){
   requests++;
-  image.onload=()=>status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · запрос '+requests;
-  image.onerror=()=>status.textContent='Ошибка загрузки · запрос '+requests;
-  image.src=base+'?t='+Date.now();
+  const url=base+'?t='+Date.now();
+  const next=new Image();
+
+  next.onload=()=>{
+    // Меняем видимый кадр только ПОСЛЕ полной загрузки нового изображения.
+    // На медленном мобильном интернете это не даёт серому placeholder появляться между запросами.
+    screen.src=url;
+    status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · кадр '+requests;
+    schedule(1000);
+  };
+
+  next.onerror=()=>{
+    status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';
+    schedule(2000);
+  };
+
+  next.src=url;
 }
+
 refresh();
-setInterval(refresh,1000);
 </script>
 </html>
