@@ -2,23 +2,12 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Трансляция экрана 1С</title>
+<title>Экран 1С</title>
 <style>
-html,body{margin:0;min-height:100%;background:#111;color:#fff;font:16px system-ui;text-align:center}
-#status{margin:10px}
-#screen{display:block;max-width:100vw;max-height:calc(100vh - 48px);width:auto;height:auto;margin:0 auto;background:#111;object-fit:contain}
+html,body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
+#status{padding:10px}
+#screen{display:block;width:100vw;height:auto;margin:0 auto;background:#111}
 </style>
-<p id="status">1С LIVE · PNG 1440×900 через Cloudinary · обновление раз в 3 секунды</p>
-<img id="screen" src="https://res.cloudinary.com/elgvc1ah/image/upload/live-frame.png?t=0" alt="Экран 1С">
-<script>
-const base = "https://res.cloudinary.com/elgvc1ah/image/upload/live-frame.png";
-const screen = document.getElementById("screen");
-function refresh() {
-  const next = new Image();
-  next.onload = () => { screen.src = next.src; };
-  next.src = base + "?t=" + Date.now();
-}
-setInterval(refresh, 3000);
-refresh();
-</script>
+<div id="status">1С · текущий кадр 1440×900</div>
+<img id="screen" src="data:image/png;base64,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...TRUNCATED..." alt="Экран 1С">
 </html>
