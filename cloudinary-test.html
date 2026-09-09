@@ -2,12 +2,23 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1С direct Cloudinary test</title>
+<title>Проверка трансляции X11</title>
 <style>
-html,body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
-#status{margin:12px}
-#screen{display:block;width:100vw;height:auto;margin:0 auto;background:#111}
+html,body{margin:0;min-height:100%;background:#111;color:#fff;font:16px system-ui;text-align:center}
+#status{margin:10px}
+#screen{display:block;max-width:100vw;max-height:calc(100vh - 48px);width:auto;height:auto;margin:0 auto;background:#111;object-fit:contain}
 </style>
-<p id="status">ПРЯМОЙ CLOUDINARY DATA URI · PNG 1440×900 · без GitHub binary</p>
-<img id="screen" src="https://res.cloudinary.com/elgvc1ah/image/upload/v1788979393/live-frame-direct-full.png" alt="Экран 1С">
+<p id="status">ТЕСТ XVFB 1440×900 · прямой PNG через Cloudinary · обновление раз в 3 секунды</p>
+<img id="screen" src="https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-direct-full.png?t=0" alt="Тестовый экран X11">
+<script>
+const base = "https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-direct-full.png";
+const screen = document.getElementById("screen");
+function refresh() {
+  const next = new Image();
+  next.onload = () => { screen.src = next.src; };
+  next.src = base + "?t=" + Date.now();
+}
+setInterval(refresh, 3000);
+refresh();
+</script>
 </html>
