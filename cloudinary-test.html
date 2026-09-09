@@ -17,7 +17,7 @@ const status=document.getElementById('status');
 let requests=0;
 let timer=null;
 
-function schedule(ms=1000){
+function schedule(ms=3000){
   clearTimeout(timer);
   timer=setTimeout(refresh,ms);
 }
@@ -28,16 +28,14 @@ function refresh(){
   const next=new Image();
 
   next.onload=()=>{
-    // Меняем видимый кадр только ПОСЛЕ полной загрузки нового изображения.
-    // На медленном мобильном интернете это не даёт серому placeholder появляться между запросами.
     screen.src=url;
     status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · кадр '+requests;
-    schedule(1000);
+    schedule(3000);
   };
 
   next.onerror=()=>{
     status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';
-    schedule(2000);
+    schedule(3000);
   };
 
   next.src=url;
