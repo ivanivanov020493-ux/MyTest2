@@ -6,32 +6,41 @@
 <style>
 html,body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
 #status{margin:12px}
-#screen{display:block;width:min(960px,100vw);height:auto;margin:auto;background:#000}
+#screen{display:block;width:min(960px,100vw);height:auto;margin:auto;background:#111}
 </style>
 <p id="status">Загрузка первого кадра…</p>
-<img id="screen" width="640" height="400" alt="Экран 1С">
+<img id="screen" alt="Экран 1С">
 <script>
 const base='https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-test-webp.webp';
 const screen=document.getElementById('screen');
 const status=document.getElementById('status');
 let requests=0;
 let timer=null;
-function schedule(ms=3000){ clearTimeout(timer); timer=setTimeout(refresh,ms); }
+
+function schedule(ms=3000){
+  clearTimeout(timer);
+  timer=setTimeout(refresh,ms);
+}
+
 function refresh(){
   requests++;
   const url=base+'?t='+Date.now();
   const next=new Image();
+
   next.onload=()=>{
     screen.src=url;
     status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · кадр '+requests;
     schedule(3000);
   };
+
   next.onerror=()=>{
     status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';
     schedule(3000);
   };
+
   next.src=url;
 }
+
 refresh();
 </script>
 </html>
