@@ -2,29 +2,12 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1С live screen</title>
+<title>1С static PNG test</title>
 <style>
 html,body{margin:0;background:#111;color:#fff;font:16px system-ui;text-align:center}
 #status{margin:12px}
-#screen{display:block;width:min(960px,100vw);height:auto;margin:auto;background:#111}
+#screen{display:block;width:100vw;height:auto;margin:0 auto;background:#111}
 </style>
-<p id="status">Проверка полного PNG…</p>
-<img id="screen" alt="Экран 1С">
-<script>
-const base='https://raw.githubusercontent.com/ivanivanov020493-ux/MyTest2/15fc88f8056e16d59eff6fd848d1b516e06146c5/cloudinary-source/live-frame.png';
-const screen=document.getElementById('screen');
-const status=document.getElementById('status');
-let requests=0;
-let timer=null;
-function schedule(ms=3000){clearTimeout(timer);timer=setTimeout(refresh,ms)}
-function refresh(){
-  requests++;
-  const url=base+'?t='+Date.now();
-  const next=new Image();
-  next.onload=()=>{screen.src=url;status.textContent='PNG напрямую из GitHub · '+new Date().toLocaleTimeString()+' · кадр '+requests;schedule(3000)};
-  next.onerror=()=>{status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';schedule(3000)};
-  next.src=url;
-}
-refresh();
-</script>
+<p id="status">СТАТИЧНЫЙ PNG · без JavaScript и автообновления</p>
+<img id="screen" src="https://raw.githubusercontent.com/ivanivanov020493-ux/MyTest2/15fc88f8056e16d59eff6fd848d1b516e06146c5/cloudinary-source/live-frame.png" alt="Экран 1С">
 </html>
