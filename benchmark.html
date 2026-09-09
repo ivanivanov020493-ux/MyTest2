@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GitHub SHA benchmark</title>
+<style>
+:root{color-scheme:dark}body{font-family:system-ui;margin:24px;max-width:980px;background:#111;color:#eee}
+.card{white-space:pre-wrap;padding:16px;border:1px solid #555;border-radius:12px;margin:12px 0}
+#box{font-size:24px;border-color:#58a6ff}#status{color:#9fe}#events,#diagnostics{font-family:ui-monospace,monospace;font-size:13px}
+small{color:#aaa}code{color:#9fe}
+</style>
+</head>
+<body>
+<h1>GitHub Pages → SHA ветки → файл по SHA</h1>
+<p>Без токена в браузере. Безопасный интервал: <code>65 секунд</code> из-за лимита GitHub REST API 60 запросов/час.</p>
+<div id="box" class="card">Загрузка…</div>
+<div id="status" class="card">Запуск…</div>
+<h2>События</h2><div id="events" class="card"></div>
+<h2>Диагностика raw/CDN</h2><div id="diagnostics" class="card">Проверка…</div>
+<small>При исчерпании API-лимита используется raw fallback, а следующий API-запрос откладывается до reset. Для стабильных 1–3 секунд нужен внешний сервер/канал событий; секретный GitHub token в публичный JavaScript помещать нельзя.</small>
+<script>
+const owner='ivanivanov020493-ux';
+const repo='MyTest2';
+const file='test.txt';
+const intervalMs=2000;
+let lastSha='';
+let timer;
+const events=[];
+function headersOf(r){
+  const names=['cache-control','etag','age','last-modified','expires','x-cache','x-cache-hits',
+    'access-control-allow-origin','x-ratelimit-limit','x-ratelimit-remaining','x-ratelimit-reset'];
+  return Object.fromEntries(names.map(n=>[n,r.headers.get(n)]));
+}
+function addEvent(message){
+  events.unshift(new Date().toISOString()+' '+message);
+  document.getElementById('events').textContent=events.slice(0,20).join('\n');
+}
+async function rawProbe(url){
+  try{
+    const r=await fetch(url,{cache:'no-store'});
+    return {url,status:r.status,headers:headersOf(r),text:(await r.text()).slice(0,300)};
+  }catch(e){return {url,error:e.message}}
+}
+async function diagnostics(){
+  const nonce=Date.now();
+  const base='https://raw.githubusercontent.com/'+owner+'/'+repo+'/';
+  const results=await Promise.all([
+    rawProbe(base+'main/'+file+'?probe='+nonce),
+    rawProbe(base+'refs/heads/main/'+file+'?probe='+nonce)
+  ]);
+  document.getElementById('diagnostics').textContent=JSON.stringify(results,null,2);
+}
+async function poll(){
+  const started=Date.now();
+  let nextDelay=intervalMs;
+  try{
+    const api='https://api.github.com/repos/'+owner+'/'+repo+'/git/ref/heads/main?probe='+Date.now();
+    const r=await fetch(api,{cache:'no-store'});
+    const h=headersOf(r);
+    if(!r.ok){
+      const fallback='https://raw.githubusercontent.com/'+owner+'/'+repo+'/refs/heads/main/'+file+'?fallback='+Date.now();
+      const f=await fetch(fallback,{cache:'no-store'});
+      if(f.ok){
+        document.getElementById('box').textContent=await f.text();
+        addEvent('API недоступен; показан raw fallback');
+      }
+      const reset=Number(h['x-ratelimit-reset']||0)*1000;
+      if(r.status===403 && h['x-ratelimit-remaining']==='0' && reset>Date.now()){
+        nextDelay=Math.max(intervalMs,reset-Date.now()+2000);
+      }
+      throw new Error('GitHub API '+r.status+'; remaining='+h['x-ratelimit-remaining']+
+        '; повтор через '+Math.ceil(nextDelay/1000)+' с');
+    }
+    const ref=await r.json();
+    const sha=ref.object.sha;
+    if(sha!==lastSha){
+      const raw='https://raw.githubusercontent.com/'+owner+'/'+repo+'/'+sha+'/'+file;
+      const f=await fetch(raw,{cache:'no-store'});
+      if(!f.ok) throw new Error('raw '+f.status);
+      document.getElementById('box').textContent=await f.text();
+      lastSha=sha;
+      addEvent('SHA '+sha.slice(0,12)+'; файл обновлён');
+    }
+    document.getElementById('status').textContent=
+      'Следующий опрос через '+Math.round(intervalMs/1000)+' с | SHA='+lastSha.slice(0,12)+
+      ' | API '+h['x-ratelimit-remaining']+'/'+h['x-ratelimit-limit']+
+      ' | reset='+h['x-ratelimit-reset']+
+      ' | запрос '+(Date.now()-started)+' мс\n'+JSON.stringify(h,null,2);
+  }catch(e){
+    document.getElementById('status').textContent='Ошибка: '+e.message;
+    addEvent('ОШИБКА '+e.message);
+  }finally{
+    timer=setTimeout(poll,nextDelay);
+  }
+}
+diagnostics();
+poll();
+</script>
+</body>
+</html>
