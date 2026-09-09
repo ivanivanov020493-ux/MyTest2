@@ -16,31 +16,15 @@ const screen=document.getElementById('screen');
 const status=document.getElementById('status');
 let requests=0;
 let timer=null;
-
-function schedule(ms=3000){
-  clearTimeout(timer);
-  timer=setTimeout(refresh,ms);
-}
-
+function schedule(ms=3000){clearTimeout(timer);timer=setTimeout(refresh,ms)}
 function refresh(){
   requests++;
   const url=base+'?t='+Date.now();
   const next=new Image();
-
-  next.onload=()=>{
-    screen.src=url;
-    status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · кадр '+requests;
-    schedule(3000);
-  };
-
-  next.onerror=()=>{
-    status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';
-    schedule(3000);
-  };
-
+  next.onload=()=>{screen.src=url;status.textContent='Обновлено: '+new Date().toLocaleTimeString()+' · кадр '+requests;schedule(3000)};
+  next.onerror=()=>{status.textContent='Ошибка загрузки · попытка '+requests+' · предыдущий кадр сохранён';schedule(3000)};
   next.src=url;
 }
-
 refresh();
 </script>
 </html>
