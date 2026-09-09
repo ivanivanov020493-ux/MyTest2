@@ -1,2 +1,2 @@
-SHA-LIVE-B-1788957445475
-Проверка SHA polling B
+SHA-LIVE-C-1788957472204
+Проверка SHA polling C
