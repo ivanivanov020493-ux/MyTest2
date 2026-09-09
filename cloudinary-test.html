@@ -2,16 +2,16 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Проверка трансляции X11</title>
+<title>Трансляция экрана 1С</title>
 <style>
 html,body{margin:0;min-height:100%;background:#111;color:#fff;font:16px system-ui;text-align:center}
 #status{margin:10px}
 #screen{display:block;max-width:100vw;max-height:calc(100vh - 48px);width:auto;height:auto;margin:0 auto;background:#111;object-fit:contain}
 </style>
-<p id="status">ТЕСТ XVFB 1440×900 · прямой PNG через Cloudinary · обновление раз в 3 секунды</p>
-<img id="screen" src="https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-direct-full.png?t=0" alt="Тестовый экран X11">
+<p id="status">1С LIVE · PNG 1440×900 через Cloudinary · обновление раз в 3 секунды</p>
+<img id="screen" src="https://res.cloudinary.com/elgvc1ah/image/upload/live-frame.png?t=0" alt="Экран 1С">
 <script>
-const base = "https://res.cloudinary.com/elgvc1ah/image/upload/live-frame-direct-full.png";
+const base = "https://res.cloudinary.com/elgvc1ah/image/upload/live-frame.png";
 const screen = document.getElementById("screen");
 function refresh() {
   const next = new Image();
